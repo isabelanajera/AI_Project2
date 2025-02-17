@@ -1,4 +1,4 @@
-# Artificial Intelligence: Project 2
+<p align="center"># Artificial Intelligence: Project 2</p>
 
 ## Adversarial Search
 
