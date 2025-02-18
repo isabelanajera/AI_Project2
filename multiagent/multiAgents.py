@@ -142,7 +142,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 return self.evaluationFunction(state)
             
             # Recursively call pacman's and ghost's actions
-            if index ==0:
+            if index ==0: # Pacman's index
                 return getMax(state, depth)
             else:
                 return getMin(state, depth, index)
@@ -183,7 +183,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
             return bestScore
 
-       
+
         return minimax(gameState, 0, 0)
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
@@ -196,8 +196,66 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
 
+        def alphaBeta(state, depth, index, alpha, beta):
+            if state.isWin() or state.isLose() or depth == self.depth:
+                return self.evaluationFunction(state)
+            
+            # Recursively call pacman's and ghost's actions
+            if index ==0:
+                return getMax(state, depth, alpha, beta)
+            else:
+                return getMin(state, depth, index, alpha, beta)
+        # Maximizer funtion for pacman action with highest score          
+        def getMax(state, depth, alpha, beta):
+            bestScore = float('-inf') # Worst score for max
+            bestAction = None
+            actions = state.getLegalActions(0)
+            
+            if state.isWin() or state.isLose(): # No action left
+                return self.evaluationFunction(state)
+            
+            for action in actions:
+                score = alphaBeta(state.generateSuccessor(0, action), depth, 1, alpha, beta)  # Go to first ghost
+                if score > bestScore:
+                    bestScore = score
+                    bestAction = action
+            
+                alpha = max(alpha, bestScore) # Alpha
+
+                if bestScore > beta: # Pruning
+                    return bestScore
+        
+            # (Root) return action else score
+            return bestAction if depth == 0 else bestScore
+        
+        # Minimizer function for ghost action with worst score
+        def getMin(state, depth, index, alpha, beta):
+            bestScore = float('inf') # Worst possible score
+            actions = state.getLegalActions(index)
+            
+            if state.isWin() or state.isLose(): # No actions left
+                return self.evaluationFunction(state)
+
+            for action in actions:
+                successor = state.generateSuccessor(index, action)
+                if index + 1 == state.getNumAgents():  # If last ghost
+                    score = alphaBeta(successor, depth + 1, 0, alpha, beta) # Next depth
+                else:  # Move to the next ghost
+                    score = alphaBeta(successor, depth, index + 1, alpha, beta)
+                # Lowest score for pacman    
+                bestScore = min(bestScore, score)
+                beta = min(beta, bestScore) # Update beta
+
+                if bestScore < alpha: # Pruning
+                    return bestScore
+
+            return bestScore
+
+       # Retruns best move at depth 0
+        return getMax(gameState, 0, float('-inf'), float('inf'))
+
+    
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
       Your expectimax agent (question 4)
