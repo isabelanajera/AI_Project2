@@ -1,27 +1,23 @@
 Please Enter your team's full names and your answers to the questions marked by QS questions here!
 
+Isabela Najera
+Casandra Roman
+
 Q1.1:
 
 Q1.2:
 
+Q2.1: The algorithm for the minimax class includes three separate functions: getMax(), getMin(), and minimax(). Minimax() recursively calls getMax() and getMin(). When the index is 0, this indicates pacmans turn since the index will always be 0. If greater than 0, then this implies a ghost's turn. The getMax() function takes in the current state and the depth, its goal is to find the best action that will maximize pacman's score. It first checks the base case of whether the state is the terminal state where the evaluation function is returned and will determine the game's state value. Else the generateSuccessors() function is called in order to get each action, and then loops through the possible actions to compute the score. By calling minimax we can then determine the ghosts move. The best action is returned at the root (max node where depth is 0), otherwise just the best score in general. As for the getMin() function, its purpose is to find an action that will minimize pacmans score. It is pretty similar to getMax() but instead it takes in an index since the ghosts index isn't constant. It also calls the minimax function to calculate scores but instead will increment either the depth (pacmans move if the last ghost has gone) or move to the next ghost when index is incremented.
 
+This algorithm works because it ensures that the scores in the minimax tree will be determined by pacman choosing the best decision (max) and the ghosts choosing the worst decision (min). It alternates between turns since index is incremented and each depth is evaluated, then scores are brought back to the root node where pacman can make the best possible move. 
 
+Q3.1: When using the alpha beta strategy, the minimax search is still used. The only difference between the two is that the alpha beta pruning will remove branches that aren’t expanded in order to optimize the search. It will still calculate the same min and max values. 
 
-Q2.1:
+Q3.2: When looping through the actions, pacman will choose the best and first minimax value that is produced. Whenever there is a tie, the action that is listed first in actions will be chosen. This occurs because of the getLegalAction() call which determines the actions ordering since successor states are not reordered.
 
-
-
-
-
-Q3.1:
-
-Q3.2
-
-
-
-Q4.1:
-
+Q4.1:This class consists of three functions: expectimax(), getMax(), and getAvg(). Like minimax, this algorithm recursively calls getMax() and getAvg() to determine turns in the expectimax() function. The getMax() function's purpose is still the same as in minimax(). Instead of using getMin(), we use a function that calculates the average (expected) score since ghosts act randomly. The calculations of the scores remain the same as the others, but in the end, the total sum is incremented and then divided by the number of possible actions which determines the expected outcome of pacmans move.
 
 Q5.1:
+
 
 
