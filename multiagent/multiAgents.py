@@ -136,7 +136,55 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def minimax(state, depth, index):
+            if state.isWin() or state.isLose() or depth == self.depth:
+                return self.evaluationFunction(state)
+            
+            # Recursively call pacman's and ghost's actions
+            if index ==0:
+                return getMax(state, depth)
+            else:
+                return getMin(state, depth, index)
+        # Maximizer funtion for pacman action with highest score          
+        def getMax(state, depth):
+            bestScore = float('-inf') # Worst score for max
+            bestAction = None
+            actions = state.getLegalActions(0)
+            
+            if state.isWin() or state.isLose(): # No action left
+                return self.evaluationFunction(state)
+            
+            for action in actions:
+                score = minimax(state.generateSuccessor(0, action), depth, 1)  # Go to first ghost
+                if score > bestScore:
+                    bestScore = score
+                    bestAction = action
+        
+            # (Root) return action else score
+            return bestAction if depth == 0 else bestScore
+        
+        # Minimizer function for ghost action with worst score
+        def getMin(state, depth, index):
+            bestScore = float('inf') # Worst possible score
+            actions = state.getLegalActions(index)
+            
+            if state.isWin() or state.isLose(): # No actions left
+                return self.evaluationFunction(state)
+
+            for action in actions:
+                successor = state.generateSuccessor(index, action)
+                if index + 1 == state.getNumAgents():  # If last ghost
+                    score = minimax(successor, depth + 1, 0) # Next depth
+                else:  # Move to the next ghost
+                    score = minimax(successor, depth, index + 1)
+                # Lowest score for pacman    
+                bestScore = min(bestScore, score)
+
+            return bestScore
+
+       
+        return minimax(gameState, 0, 0)
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
