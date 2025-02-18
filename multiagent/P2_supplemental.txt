@@ -1,13 +1,28 @@
 Please Enter your team's full names and your answers to the questions marked by QS questions here!
+Team: Natalie Roman and Isabela Najera
 
-Q1.1:
+Q1.1: Explain the implementation of ReflexAgent in multiAgents.py and how you improved it.
 
-Q1.2:
+The implementation of ReflexAgent in multiAgents.py is to decide the best actions to take by evaluating the environment.
+It keeps score for the regex agent and if the score is higher, it is a more efficient and better route to win.
+So overall, we calculate, bad moves substracting from the score, and better moves adding to the score, to overall
+choose the best score (the highest) to send to the agent. Based on what you have given us, the Pacman Position, 
+the food count, and Pacman Scared timer, we calculated the score based on these values. For example with food, we
+added to the score for the closest food, after searching for it, to encourage the Pacman to choose the closest food.
+For the ghosts, to discourage Pacman from getting near, we checked for nonscared ghosts being close and deducted points
+if it was. In the end we just made sure the Pacman was discouraged from stopping overall or getting stuck. All of these
+moves should encourage the Pacman to take the best path to get the highest score when before it was not choosing its next
+option based on the environment and those values.
 
+Q1.2: What is your value function and why do you think this estimation makes sense?
 
+The value function is what we are using to incentivize the pacman to win, like the distances to food, ghosts, whether the 
+ghost is scared and this will all be kept track by the score. It makes senes because in order to win the game or evaluate the best
+moves for the game, obviously the higher score is more ideal. With evaluating things like ghosts and if they are scared we are 
+able to estimate whether the pacman should move away or not. All of things that play into the value function should overall
+help pacman decide the best moves depending on its environment.
 
-
-Q2.1:
+Q2.1: Explain your algorithm. Why do you think it is working?
 
 
 

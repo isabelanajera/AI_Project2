@@ -51,6 +51,7 @@ class ReflexAgent(Agent):
         "Add more of your code here if you want to"
 
         return legalMoves[chosenIndex]
+    
 
     def evaluationFunction(self, currentGameState: GameState, action):
         """
@@ -74,8 +75,81 @@ class ReflexAgent(Agent):
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
+        # to improve this, we will be using what you give us, like the remaining food and
+        # the pacman position after moving, and scared ghosts
+
+
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+
+        # start off with 0
+        score = 0
+        
+        # we want to encourage winning so if the sucesssor state is winning then
+        # return super high value
+        if successorGameState.isWin():
+            return 999999
+
+        # evaluating food portion
+        # hint to use newFood asList function
+        foodList = newFood.asList()
+        foodDistance = [0]
+        # calculate manhattan distance to the available food
+        for pos in foodList:
+            foodDistance.append(manhattanDistance(newPos,pos))
+            
+        # number of available food in the game
+        availableFood = len(foodList)
+        # number of remaining food in the current state
+        remainingFood = len(currentGameState.getFood().asList())
+        # number of how many capsules there are
+        capsules = len(successorGameState.getCapsules())
+       
+        # if there is available food, subtract from score    
+        score -= 10 * availableFood
+
+        # add score if pacman eats capsule to encourage
+        if newPos in currentGameState.getCapsules():
+            score += 150 * capsules
+
+        # add score if there is less available food 
+        if availableFood < remainingFood:
+            score += 200
+
+
+        # evaluating ghosts portion
+        # we will get the pos of ghosts in the successor state and then calculate 
+        # manhattan distance of the player and the ghosts
+        ghostPositions = [ghost.getPosition() for ghost in newGhostStates]
+        ghostDist = [manhattanDistance(newPos, pos) for pos in ghostPositions]
+
+        # now we find the position of ghost in current state and calculate that
+        # manhattan distance
+        currentGhostPositions = [ghost.getPosition() for ghost in currentGameState.getGhostStates()]
+        currentGhostDist = [manhattanDistance(newPos, pos) for pos in currentGhostPositions]
+
+        # if ghosts are scared, then less distance is better else if ghosts are not 
+        # scared, deduct score to encourage adding distance
+        totalScaredTimes = sum(newScaredTimes)
+        if totalScaredTimes > 0 :
+            if min(currentGhostDist) < min(ghostDist):
+                score += 200
+            else:
+                score -=100
+        else:
+            if min(currentGhostDist) < min(ghostDist):
+                score -= 100
+            else:
+                score += 200
+        
+        # add the difference in game score between the successor state and the current state
+        # to evaluate if the move is improved or was worse
+        score += successorGameState.getScore() - currentGameState.getScore()
+        
+        # deduct points if stopping
+        if action == Directions.STOP:
+            score -= 10
+
+        return score
 
 def scoreEvaluationFunction(currentGameState: GameState):
     """
