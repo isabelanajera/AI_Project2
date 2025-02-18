@@ -44,8 +44,8 @@ class ReflexAgent(Agent):
 
         # Choose one of the best actions
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
-        bestScore = max(scores)
-        bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
+        v = max(scores)
+        bestIndices = [index for index in range(len(scores)) if scores[index] == v]
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
         "Add more of your code here if you want to"
@@ -210,7 +210,54 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def minimax(state, depth, index):
+            if state.isWin() or state.isLose() or depth == self.depth:
+                return self.evaluationFunction(state)
+            
+            # Recursively call pacman's and ghost's actions
+            if index ==0: # Pacman's index
+                return getMax(state, depth)
+            else:
+                return getMin(state, depth, index)
+        # Maximizer funtion for pacman action with highest score          
+        def getMax(state, depth):
+            v = float('-inf') # Worst score for max
+            bestAction = None
+            actions = state.getLegalActions(0)
+            
+            if state.isWin() or state.isLose(): # No action left
+                return self.evaluationFunction(state)
+            
+            for action in actions:
+                score = minimax(state.generateSuccessor(0, action), depth, 1)  # Go to first ghost
+                if score > v:
+                    v = score
+                    bestAction = action
+        
+            # (Root) return action else score
+            return bestAction if depth == 0 else v
+        
+        # Minimizer function for ghost action with worst score
+        def getMin(state, depth, index):
+            v = float('inf') # Worst possible score
+            actions = state.getLegalActions(index)
+            
+            if state.isWin() or state.isLose(): # No actions left
+                return self.evaluationFunction(state)
+
+            for action in actions:
+                if index + 1 == state.getNumAgents():  # If last ghost
+                    score = minimax(state.generateSuccessor(index, action), depth + 1, 0) # Next depth
+                else:  # Move to the next ghost
+                    score = minimax(state.generateSuccessor(index, action), depth, index + 1)
+                # Lowest score for pacman    
+                v = min(v, score)
+
+            return v
+
+
+        return minimax(gameState, 0, 0)
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -222,8 +269,65 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
 
+        def alphaBeta(state, depth, index, alpha, beta):
+            if state.isWin() or state.isLose() or depth == self.depth:
+                return self.evaluationFunction(state)
+            
+            # Recursively call pacman's and ghost's actions
+            if index ==0:
+                return getMax(state, depth, alpha, beta)
+            else:
+                return getMin(state, depth, index, alpha, beta)
+        # Maximizer funtion for pacman action with highest score          
+        def getMax(state, depth, alpha, beta):
+            v = float('-inf') # Worst score for max
+            bestAction = None
+            actions = state.getLegalActions(0)
+            
+            if state.isWin() or state.isLose(): # No action left
+                return self.evaluationFunction(state)
+            
+            for action in actions:
+                score = alphaBeta(state.generateSuccessor(0, action), depth, 1, alpha, beta)  # Go to first ghost
+                if score > v:
+                    v = score
+                    bestAction = action
+            
+                alpha = max(alpha, v) # Alpha
+
+                if v > beta: # Pruning
+                    return v
+        
+            # (Root) return action else score
+            return bestAction if depth == 0 else v
+        
+        # Minimizer function for ghost action with worst score
+        def getMin(state, depth, index, alpha, beta):
+            v = float('inf') # Worst possible score
+            actions = state.getLegalActions(index)
+            
+            if state.isWin() or state.isLose(): # No actions left
+                return self.evaluationFunction(state)
+
+            for action in actions:
+                if index + 1 == state.getNumAgents():  # If last ghost
+                    score = alphaBeta(state.generateSuccessor(index, action), depth + 1, 0, alpha, beta) # Next depth
+                else:  # Move to the next ghost
+                    score = alphaBeta(state.generateSuccessor(index, action), depth, index + 1, alpha, beta)
+                # Lowest score for pacman    
+                v = min(v, score)
+                beta = min(beta, v) # Update beta
+
+                if v < alpha: # Pruning
+                    return v
+
+            return v
+
+       # Retruns best move at depth 0
+        return getMax(gameState, 0, float('-inf'), float('inf'))
+
+    
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
       Your expectimax agent (question 4)
@@ -237,7 +341,50 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        def expectimax(state, depth, index):
+            if state.isWin() or state.isLose() or depth == self.depth:
+                return self.evaluationFunction(state)
+            
+            # Recursively call pacman's and ghost's actions
+            if index ==0: # Pacman's index
+                return getMax(state, depth)
+            else:
+                return getAvg(state, depth, index)
+        # Maximizer funtion for pacman action with highest score          
+        def getMax(state, depth):
+            v = float('-inf') # Worst score for max
+            bestAction = None
+            actions = state.getLegalActions(0)
+            
+            if state.isWin() or state.isLose(): # No action left
+                return self.evaluationFunction(state)
+            
+            for action in actions:
+                score = getAvg(state.generateSuccessor(0, action), depth, 1)  # Go to first ghost
+                if score > v:
+                    v = score
+                    bestAction = action
+        
+            # (Root) return action else score
+            return bestAction if depth == 0 else v
+
+        def getAvg(state, depth, index):
+            avg = 0
+            actions = state.getLegalActions(index)
+            
+            if state.isWin() or state.isLose(): # No actions left
+                return self.evaluationFunction(state)
+
+            for action in actions:
+                if index + 1 == state.getNumAgents():  # If last ghost
+                    score = expectimax(state.generateSuccessor(index, action), depth + 1, 0) # Next depth
+                else:  # Move to the next ghost
+                    score = expectimax(state.generateSuccessor(index, action), depth, index + 1)
+
+                avg += score # Sum of all scores
+            return avg / len(actions) # The average for expectimax
+        
+        return expectimax(gameState, 0, 0)
 
 def betterEvaluationFunction(currentGameState: GameState):
     """

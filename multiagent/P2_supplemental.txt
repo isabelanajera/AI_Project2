@@ -1,4 +1,5 @@
 Please Enter your team's full names and your answers to the questions marked by QS questions here!
+
 Team: Natalie Roman and Isabela Najera
 
 Q1.1: Explain the implementation of ReflexAgent in multiAgents.py and how you improved it.
@@ -36,7 +37,9 @@ Q3.2
 
 Q4.1:
 
+Q4.1:This class consists of three functions: expectimax(), getMax(), and getAvg(). Like minimax, this algorithm recursively calls getMax() and getAvg() to determine turns in the expectimax() function. The getMax() function's purpose is still the same as in minimax(). Instead of using getMin(), we use a function that calculates the average (expected) score since ghosts act randomly. The calculations of the scores remain the same as the others, but in the end, the total sum is incremented and then divided by the number of possible actions which determines the expected outcome of pacmans move.
 
 Q5.1:
+
 
 
