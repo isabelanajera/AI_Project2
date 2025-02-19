@@ -46,4 +46,10 @@ is listed first in actions will be chosen. This occurs because of the getLegalAc
 Q4.1:This class consists of three functions: expectimax(), getMax(), and getAvg(). Like minimax, this algorithm recursively calls getMax() and getAvg() 
 to determine turns in the expectimax() function. The getMax() function's purpose is still the same as in minimax(). Instead of using getMin(), we use a function that calculates the average (expected) score since ghosts act randomly. The calculations of the scores remain the same as the others, but in the end, the total sum is incremented and then divided by the number of possible actions which determines the expected outcome of pacmans move.
 
-Q5.1:
+Q5.1: This evaluation is better than my previous ones because I tried making both the food and ghost evaluations better on their own and improved their 
+evaluations based on other information available to us. For the food evaluation, before we simply calculated the distance from the food and incentivized going
+towards food, but with the better evaluation, we also calculated the closest food so that we could first go after that food before others, which made it better.
+For ghosts, instead of calculating it based on the current and successor ghosts distance, we found the current ghosts distances, and based off if there were scared or not,
+we did better incentivizes. If ghosts are scared, we add negative distances which makes Pacman chase after them. If they are not scared, we focus on getting Pacman to not only
+avoid them but also go after capsules which is better overall. This approach is essentially the same but instead we consider new things like going after
+weighted foods, using capsules when ghosts are further, etc. It helps come up with a more efficient strategy than before.

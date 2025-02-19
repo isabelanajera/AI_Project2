@@ -391,10 +391,69 @@ def betterEvaluationFunction(currentGameState: GameState):
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 
-    DESCRIPTION: <write something here so we know what you did>
+    DESCRIPTION:
+    This evaluation function takes into account different environmental and other factors to incentivize
+    the pacman to choose the best options. The better options, are the ones that gives us high scores.
+    We evaluate things like food, ghosts (if they are scared or not) and capsules.
+
+    With food, we calculate the distance to the food, and with the "better" evaluation function, this time 
+    we calculate which food is closer, so that we add more points to the score if it goes after closer food first,
+    which is overall optimally better and more efficient. 
+
+    With ghosts, we calculate the distance and also if they are scared or not. if they are scared then we 
+    subtract the distance with the capsules so that we can incentivize the pacman to go towards them and if they 
+    are not scared then add so that they stay away,
+    
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # get same info that we got before but from the current game
+    newPos = currentGameState.getPacmanPosition()
+    newFood = currentGameState.getFood()
+    newGhostStates = currentGameState.getGhostStates()
+    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+
+    # initialize score
+    score = 0
+
+    # evaluating food portion
+    # hint to use newFood asList function
+    foodList = newFood.asList()
+    foodDistance = [0]
+    # calculate manhattan distance to the available food
+    for pos in foodList:
+        foodDistance.append(manhattanDistance(newPos,pos))
+
+    ## CHANGES 
+    # number of not available food
+    noFood = len(newFood.asList(False))   
+
+    # find closer food to incentivize getting closer food rather than food far away
+    closerFood = 0
+    foodDistances = sum(foodDistance)
+    if foodDistances > 0:
+        closerFood = 1.0 / foodDistances
+    score += currentGameState.getScore() + closerFood + noFood
+
+    # evaluating ghosts portion
+    # we will get the pos of ghosts in the current state and then calculate 
+    # manhattan distance of the player and the ghosts
+    ghostPositions = [ghost.getPosition() for ghost in newGhostStates]
+    ghostDist = [manhattanDistance(newPos, pos) for pos in ghostPositions]
+    totalScaredTimes = sum(newScaredTimes)
+    totalGhostDist = sum(ghostDist)
+    
+    capsules = len(currentGameState.getCapsules())
+
+    # if ghost is scared
+    if totalScaredTimes > 0:
+        # subtract number of distance from ghost from score to get closer to scared ghost
+        score += totalScaredTimes + (-1 * capsules) + (-1 * totalGhostDist)
+    # if ghost is not scared then add distance and add capsules 
+    else :
+        score += totalGhostDist + capsules
+    return score
+
+   
 
 # Abbreviation
 better = betterEvaluationFunction
